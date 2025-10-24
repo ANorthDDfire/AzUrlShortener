@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json.schemastore.org/aspire-8.0.json",
+  "resources": {
+    "CustomDomain": {
+      "type": "parameter.v0",
+      "value": "{CustomDomain.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "DefaultRedirectUrl": {
+      "type": "parameter.v0",
+      "value": "{DefaultRedirectUrl.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "url-data": {
+      "type": "azure.bicep.v0",
+      "path": "url-data.module.bicep"
+    },
+    "strTables": {
+      "type": "value.v0",
+      "connectionString": "{url-data.outputs.tableEndpoint}"
+    },
+    "funcstoragea17ca": {
+      "type": "azure.bicep.v0",
+      "path": "funcstoragea17ca.module.bicep"
+    },
+    "azfunc-light": {
+      "type": "project.v0",
+      "path": "../src/FunctionsLight/Cloud5mins.ShortenerTools.FunctionsLight.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+        "AzureFunctionsJobHost__telemetryMode": "OpenTelemetry",
+        "ASPNETCORE_URLS": "http://\u002B:{azfunc-light.bindings.http.targetPort}",
+        "AzureWebJobsStorage__blobServiceUri": "{funcstoragea17ca.outputs.blobEndpoint}",
+        "AzureWebJobsStorage__queueServiceUri": "{funcstoragea17ca.outputs.queueEndpoint}",
+        "AzureWebJobsStorage__tableServiceUri": "{funcstoragea17ca.outputs.tableEndpoint}",
+        "Aspire__Azure__Storage__Blobs__AzureWebJobsStorage__ServiceUri": "{funcstoragea17ca.outputs.blobEndpoint}",
+        "Aspire__Azure__Storage__Queues__AzureWebJobsStorage__ServiceUri": "{funcstoragea17ca.outputs.queueEndpoint}",
+        "Aspire__Azure__Data__Tables__AzureWebJobsStorage__ServiceUri": "{funcstoragea17ca.outputs.tableEndpoint}",
+        "strTables__tableServiceUri": "{url-data.outputs.tableEndpoint}",
+        "Aspire__Azure__Data__Tables__strTables__ServiceUri": "{url-data.outputs.tableEndpoint}",
+        "DefaultRedirectUrl": "{DefaultRedirectUrl.value}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http",
+          "targetPort": 8080,
+          "external": true
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http",
+          "targetPort": 8080,
+          "external": true
+        }
+      }
+    },
+    "api": {
+      "type": "project.v0",
+      "path": "../src/Api/Cloud5mins.ShortenerTools.Api.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+        "HTTP_PORTS": "{api.bindings.http.targetPort}",
+        "ConnectionStrings__strTables": "{strTables.connectionString}",
+        "CustomDomain": "{CustomDomain.value}",
+        "DefaultRedirectUrl": "{DefaultRedirectUrl.value}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http"
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http"
+        }
+      }
+    },
+    "admin": {
+      "type": "project.v0",
+      "path": "../src/TinyBlazorAdmin/Cloud5mins.ShortenerTools.TinyBlazorAdmin.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+        "HTTP_PORTS": "{admin.bindings.http.targetPort}",
+        "services__api__http__0": "{api.bindings.http.url}",
+        "services__api__https__0": "{api.bindings.https.url}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http",
+          "external": true
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http",
+          "external": true
+        }
+      }
+    },
+    "url-data-roles": {
+      "type": "azure.bicep.v0",
+      "path": "url-data-roles.module.bicep",
+      "params": {
+        "url_data_outputs_name": "{url-data.outputs.name}",
+        "principalType": "",
+        "principalId": ""
+      }
+    },
+    "funcstoragea17ca-roles": {
+      "type": "azure.bicep.v0",
+      "path": "funcstoragea17ca-roles.module.bicep",
+      "params": {
+        "funcstoragea17ca_outputs_name": "{funcstoragea17ca.outputs.name}",
+        "principalType": "",
+        "principalId": ""
+      }
+    }
+  }
+}
